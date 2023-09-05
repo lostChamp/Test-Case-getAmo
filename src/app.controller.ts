@@ -7,12 +7,6 @@ import {Request} from "express";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get("/checkContacts")
-  async checkContacts() {
-    const res = await this.appService.checkContacts();
-    console.log(res);
-  }
-
   @Get("")
   async getAccessToken(@Req() req: Request) {
     const code = String(req["query"]["code"]);
@@ -26,13 +20,14 @@ export class AppController {
     return accessToken;
   }
 
-  @Get("/getInfo/:name/:email/:phone")
-  getInfoForAmoCRM(
+  @Get("/createDeal/:name/:email/:phone")
+  async createDeal(
       @Param("name") clientName: string,
       @Param("email") clientEmail: string,
       @Param("phone") clientPhone: string
   ) {
-
+    const res = await this.appService.checkContacts(clientEmail, clientPhone, clientName);
+    console.log(res);
   }
 
 

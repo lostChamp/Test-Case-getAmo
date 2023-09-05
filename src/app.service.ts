@@ -6,7 +6,7 @@ import {isLogLevelEnabled} from "@nestjs/common/services/utils";
 @Injectable()
 export class AppService {
 
-     async checkContacts() {
+     async checkContacts(clientEmail: string, clientPhone: string, clientName: string) {
         const route = process.env.ADMIN_URI + "api/v4/contacts";
         const token = process.env.ACCESS_TOKEN;
         const res = await axios.get(route, {
@@ -14,8 +14,42 @@ export class AppService {
                 Authorization: `Bearer ${token}`
             }
         });
-        const contacts = res["data"]["_embedded"]["contacts"]
-        return contacts;
+        const contacts = res["data"]["_embedded"]["contacts"];
+        let flag = false;
+        let idContactForUpdate = 5;
+        for(let i = 0; i < contacts.length; i++) {
+            const contact = contacts[i];
+            if(contact.hasOwnProperty("custom_fields_values")) {
+                const customFieldsValues = contacts[i]["custom_fields_values"];
+                for(let j = 0; j < customFieldsValues.length; j++) {
+                    const fieldCode = customFieldsValues[j]["field_code"];
+                    const values = customFieldsValues[j]["values"][0];
+                    if(fieldCode === "PHONE" && values["value"] === clientPhone ||
+                        fieldCode === "EMAIL" && values["value"] === clientEmail) {
+                        flag = true;
+                        idContactForUpdate = i;
+                        break;
+                    }
+                }
+            }
+
+            if(flag) {
+                break;
+            }
+        }
+        return idContactForUpdate;
+    }
+
+    async updateUserData(idContact) {
+        const route = process.env.ADMIN_URI + `api/v4/contacts/${idContact}`;
+        const token = process.env.ACCESS_TOKEN;
+        const res = await axios.patch(route, [
+
+        ], {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
     }
 
     async getAccessToken(authorizationCode: string) {
