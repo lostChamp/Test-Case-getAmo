@@ -6,9 +6,21 @@ import {isLogLevelEnabled} from "@nestjs/common/services/utils";
 @Injectable()
 export class AppService {
 
+     async checkContacts() {
+        const route = process.env.ADMIN_URI + "api/v4/contacts";
+        const token = process.env.ACCESS_TOKEN;
+        const res = await axios.get(route, {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        });
+        const contacts = res["data"]["_embedded"]["contacts"]
+        return contacts;
+    }
+
     async getAccessToken(authorizationCode: string) {
         const axiosInstance = axios.create({
-            baseURL: process.env.ADMIN_URI
+            baseURL: process.env.ADMIN_URI_FOR_AUTH
         });
         const route = "access_token?=" + process.env.SESSION_KEY;
         const res = await axiosInstance.post(route, {
@@ -24,7 +36,7 @@ export class AppService {
 
     async getNewAccessTokenByRefresh() {
         const axiosInstance = axios.create({
-            baseURL: process.env.ADMIN_URI
+            baseURL: process.env.ADMIN_URI_FOR_AUTH
         });
         const route = "access_token?=" + process.env.SESSION_KEY;
         const res = await axiosInstance.post(route, {

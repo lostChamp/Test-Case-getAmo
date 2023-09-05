@@ -7,6 +7,12 @@ import {Request} from "express";
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  @Get("/checkContacts")
+  async checkContacts() {
+    const res = await this.appService.checkContacts();
+    console.log(res);
+  }
+
   @Get("")
   async getAccessToken(@Req() req: Request) {
     const code = String(req["query"]["code"]);
