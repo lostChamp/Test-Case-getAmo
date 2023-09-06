@@ -21,7 +21,7 @@ export class AppController {
   }
 
   @Get("/createDeal/:name/:email/:phone")
-  async createDeal(
+  async checkContactsAndCreateDeal(
       @Param("name") clientName: string,
       @Param("email") clientEmail: string,
       @Param("phone") clientPhone: string
