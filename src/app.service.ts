@@ -6,38 +6,39 @@ import {isLogLevelEnabled} from "@nestjs/common/services/utils";
 @Injectable()
 export class AppService {
 
-     async checkContacts(clientEmail: string, clientPhone: string, clientName: string) {
-        const route = process.env.ADMIN_URI + "api/v4/contacts";
+     async checkContactsAndCreateDeal(clientEmail: string, clientPhone: string, clientName: string) {
+        const routeByEmail = process.env.ADMIN_URI + `api/v4/contacts?query=${clientEmail}`;
+        const routeByPhone = process.env.ADMIN_URI + `api/v4/contacts?query=${clientPhone}`;
         const token = process.env.ACCESS_TOKEN;
-        const res = await axios.get(route, {
+        const resByEmail = await axios.get(routeByEmail, {
             headers: {
                 Authorization: `Bearer ${token}`
             }
         });
-        const contacts = res["data"]["_embedded"]["contacts"];
-        let flag = false;
-        let idContactForUpdate = 5;
-        for(let i = 0; i < contacts.length; i++) {
-            const contact = contacts[i];
-            if(contact.hasOwnProperty("custom_fields_values")) {
-                const customFieldsValues = contacts[i]["custom_fields_values"];
-                for(let j = 0; j < customFieldsValues.length; j++) {
-                    const fieldCode = customFieldsValues[j]["field_code"];
-                    const values = customFieldsValues[j]["values"][0];
-                    if(fieldCode === "PHONE" && values["value"] === clientPhone ||
-                        fieldCode === "EMAIL" && values["value"] === clientEmail) {
-                        flag = true;
-                        idContactForUpdate = i;
-                        break;
-                    }
-                }
-            }
+         const resByPhone = await axios.get(routeByPhone, {
+             headers: {
+                 Authorization: `Bearer ${token}`
+             }
+         });
 
-            if(flag) {
-                break;
-            }
-        }
-        return idContactForUpdate;
+         if(resByEmail.data === '' && resByPhone.data === '') {
+             const res = this.createUser(clientPhone, clientEmail, clientName);
+             return res;
+         }
+    }
+
+    async createDeal() {
+         const route = process.env.ADMIN_URI + `/api/v4/leads`;
+         const token = process.env.ACCESS_TOKEN;
+         const res = await axios.post(route, [
+             {
+
+             }
+         ], {
+             headers: {
+                 Authorization: `Bearer ${token}`
+             }
+         });
     }
 
     async updateUserData(idContact) {
@@ -50,6 +51,43 @@ export class AppService {
                 Authorization: `Bearer ${token}`
             }
         });
+    }
+
+    async createUser(clientPhone: string, clientEmail: string, clientName: string) {
+        const route = process.env.ADMIN_URI + `api/v4/contacts`;
+        const token = process.env.ACCESS_TOKEN;
+        const arrayName = /(?=[А-ЯЁ])/g[Symbol.split](clientName);
+        const firstName = arrayName[0];
+        const lastName = arrayName[1];
+        const res = await axios.post(route, [
+            {
+                first_name: firstName,
+                last_name: lastName,
+                custom_fields_values: [
+                    {
+                        field_id: 1470495,
+                        values: [
+                            {
+                                value: clientPhone
+                            }
+                        ]
+                    },
+                    {
+                        field_id: 1470497,
+                        values: [
+                            {
+                                value: clientEmail
+                            }
+                        ]
+                    },
+                ],
+            }
+        ], {
+            headers: {
+                Authorization: `Bearer ${token}`
+            }
+        })
+        return `Пользователь ${firstName} ${lastName} зарегистрирован!`;
     }
 
     async getAccessToken(authorizationCode: string) {

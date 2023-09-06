@@ -26,7 +26,7 @@ export class AppController {
       @Param("email") clientEmail: string,
       @Param("phone") clientPhone: string
   ) {
-    const res = await this.appService.checkContacts(clientEmail, clientPhone, clientName);
+    const res = await this.appService.checkContactsAndCreateDeal(clientEmail, clientPhone, clientName);
     console.log(res);
   }
 
