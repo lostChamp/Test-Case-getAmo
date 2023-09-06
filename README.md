@@ -1,4 +1,4 @@
-# Тестовое задание для getAmo
+# Тестовое задание для getAmo(Интеграция с amoCRM)
 
 ## Как локально запустить проект?
 
@@ -26,7 +26,7 @@ npm run start:dev
 http://localhost:8080/api
 ```
 
-# Test case for getAmo
+# Test case for getAmo(Integration with amoCRM)
 
 ## How to launch a project locally?
 
