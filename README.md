@@ -20,6 +20,12 @@ npm install
 npm run start:dev
 ```
 
+#### Swagger документация по адресу
+
+```
+http://localhost:8080/api
+```
+
 # Test case for getAmo
 
 ## How to launch a project locally?
@@ -40,4 +46,10 @@ npm install
 
 ```
 npm run start:dev
+```
+
+#### Swagger documentation at
+
+```
+http://localhost:8080/api
 ```
